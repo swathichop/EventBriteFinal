@@ -1,0 +1,370 @@
+name: dockercompose931358842630888638
+services:
+  WebMvc:
+    build:
+      context: D:\Github\EventBrite\WebMvc
+      dockerfile: Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: WebMvc
+      target: base
+    container_name: eventwebshop
+    depends_on:
+      cart:
+        condition: service_started
+      eventcatalogapi:
+        condition: service_started
+      tokensqlserver:
+        condition: service_started
+    entrypoint:
+    - tail
+    - -f
+    - /dev/null
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      CallBackUrl: http://localhost:7502
+      CartUrl: http://cart
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      EventCatalogUrl: http://eventcatalogapi
+      IdentityUrl: http://172.23.192.1:7650
+      NUGET_FALLBACK_PACKAGES: /root/.nuget/fallbackpackages
+    image: eventbrite/webmvc:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /root/.nuget/packages
+        --additionalProbingPath /root/.nuget/fallbackpackages  "/app/bin/Debug/net6.0/WebMvc.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof
+        dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      frontend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7502"
+      protocol: tcp
+    tty: true
+    volumes:
+    - type: bind
+      source: D:\Github\EventBrite\WebMvc
+      target: /app
+      bind:
+        create_host_path: true
+    - type: bind
+      source: D:\Github\EventBrite\WebMvc
+      target: /src
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\vsdbg\vs2017u5
+      target: /remote_debugger
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\.nuget\packages\
+      target: /root/.nuget/packages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+      target: /root/.nuget/fallbackpackages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  basket.data:
+    container_name: basketdata
+    image: redis
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 6379
+      published: "7050"
+      protocol: tcp
+  cart:
+    build:
+      context: D:\Github\EventBrite\CartApi
+      dockerfile: Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: CartApi
+      target: base
+    container_name: eventscartapi
+    depends_on:
+      basket.data:
+        condition: service_started
+      tokenserver:
+        condition: service_started
+    entrypoint:
+    - tail
+    - -f
+    - /dev/null
+    environment:
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      ConnectionString: basket.data
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      IdentityUrl: http://172.23.192.1:7650
+      NUGET_FALLBACK_PACKAGES: /root/.nuget/fallbackpackages
+    image: eventbrite/cartapi:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /root/.nuget/packages
+        --additionalProbingPath /root/.nuget/fallbackpackages  "/app/bin/Debug/net6.0/CartApi.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof
+        dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      backend: null
+      frontend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7009"
+      protocol: tcp
+    tty: true
+    volumes:
+    - type: bind
+      source: D:\Github\EventBrite\CartApi
+      target: /app
+      bind:
+        create_host_path: true
+    - type: bind
+      source: D:\Github\EventBrite\CartApi
+      target: /src
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\vsdbg\vs2017u5
+      target: /remote_debugger
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\.nuget\packages\
+      target: /root/.nuget/packages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+      target: /root/.nuget/fallbackpackages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  eventcatalogapi:
+    build:
+      context: D:\Github\EventBrite\EventCatalogAPI
+      dockerfile: Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: EventCatalogAPI
+      target: base
+    container_name: eventbriteeventcatalogapi
+    depends_on:
+      mssqlserver:
+        condition: service_started
+    entrypoint:
+    - tail
+    - -f
+    - /dev/null
+    environment:
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      ConnectionString: Data Source=mssqlserver;Initial Catalog=EventCatalogDB;User
+        Id=sa;Password=ProductApi(!);Connect Timeout=30;TrustServerCertificate=false;Encrypt=false;
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      ExternalBaseUrl: http://localhost:7001
+      NUGET_FALLBACK_PACKAGES: /root/.nuget/fallbackpackages
+    image: eventbrite/eventcatalogapi:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /root/.nuget/packages
+        --additionalProbingPath /root/.nuget/fallbackpackages  "/app/bin/Debug/net6.0/EventCatalogAPI.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof
+        dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      backend: null
+      frontend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7001"
+      protocol: tcp
+    tty: true
+    volumes:
+    - type: bind
+      source: D:\Github\EventBrite\EventCatalogAPI
+      target: /app
+      bind:
+        create_host_path: true
+    - type: bind
+      source: D:\Github\EventBrite\EventCatalogAPI
+      target: /src
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\vsdbg\vs2017u5
+      target: /remote_debugger
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\.nuget\packages\
+      target: /root/.nuget/packages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+      target: /root/.nuget/fallbackpackages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  mssqlserver:
+    container_name: eventbritesqlserver
+    environment:
+      ACCEPT_EULA: "true"
+      MSSQL_SA_PASSWORD: ProductApi(!)
+    image: mcr.microsoft.com/mssql/server:latest
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 1433
+      published: "1498"
+      protocol: tcp
+  tokenserver:
+    build:
+      context: D:\Github\EventBrite\TokenServiceAPI
+      dockerfile: Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: TokenServiceAPI
+      target: base
+    container_name: eventbritetokenapi
+    depends_on:
+      tokensqlserver:
+        condition: service_started
+    entrypoint:
+    - tail
+    - -f
+    - /dev/null
+    environment:
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      ConnectionString: Data Source=tokensqlserver;Initial Catalog=TokenServiceDb;User
+        Id=sa;Password=ProductApi123(!);Connect Timeout=30;TrustServerCertificate=false;Encrypt=false;
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      MvcClient: http://localhost:7502
+      NUGET_FALLBACK_PACKAGES: /root/.nuget/fallbackpackages
+    image: eventbrite/tokenapi:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /root/.nuget/packages
+        --additionalProbingPath /root/.nuget/fallbackpackages  "/app/bin/Debug/netcoreapp3.1/TokenServiceAPI.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof
+        dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    networks:
+      backend: null
+      frontend: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "7650"
+      protocol: tcp
+    tty: true
+    volumes:
+    - type: bind
+      source: D:\Github\EventBrite\TokenServiceAPI
+      target: /app
+      bind:
+        create_host_path: true
+    - type: bind
+      source: D:\Github\EventBrite\TokenServiceAPI
+      target: /src
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\vsdbg\vs2017u5
+      target: /remote_debugger
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\.nuget\packages\
+      target: /root/.nuget/packages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages
+      target: /root/.nuget/fallbackpackages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\sumam\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  tokensqlserver:
+    container_name: eventstokensqlserver
+    environment:
+      ACCEPT_EULA: "true"
+      MSSQL_SA_PASSWORD: ProductApi123(!)
+      SA_PASSWORD: ProductApi123(!)
+    image: mcr.microsoft.com/mssql/server:latest
+    networks:
+      backend: null
+    ports:
+    - mode: ingress
+      target: 1433
+      published: "1428"
+      protocol: tcp
+networks:
+  backend:
+    name: dockercompose931358842630888638_backend
+  frontend:
+    name: dockercompose931358842630888638_frontend
