@@ -15,14 +15,17 @@ http://localhost:7044/api/EventCatalog/EventItems
 http://localhost:7044/api/Eventpic/2
 
 
-Assignment3b:
+
+#Assignment3b:
 
 Integrated Webmvc client with EventCatalogAPI where we can see all the list of Events and prices, which can be filtered based on the Event Organizer and Event Type drop downs.
 Created TokenServiceAPI for authentication and authorization , integrated with Webmvc client
 A database is created to storage user names and passwords and we seed it with the user me@myemail.com.
 URL to be used for testing the website that shows the list of Events and the prices: http://localhost:7502
 On click of About on the home page it will authenticate and take us to the login page to provide the credentials where it will show the details related to the Token(shows the access token)
-Assignment 3c:
+
+
+#Assignment 3c:
 
 Created Cart, Order Microservices and integrated with web MVC client.
 We used Redis for in - memory database for CartApi to store items in cart.
