@@ -1,4 +1,7 @@
 # EventBrite
+
+#Assignment3a:
+
 EventCatalogAPI Microservice - To build the website http://eventbrite.com
 1. It has 3 domains - EventItems, EventOrganizer, EventTypes:
  a) EventType  - This is to to store the type of Event details like Music, Kids etc 
